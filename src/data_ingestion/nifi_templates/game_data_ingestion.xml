@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<template encoding-version="1.3">
+    <description>Ingest game data from CSV files</description>
+    <groupId>game-analytics-group</groupId>
+    <name>Game Data Ingestion</name>
+    <snippet>
+        <processors>
+            <processor>
+                <id>GetFile</id>
+                <class>org.apache.nifi.processors.standard.GetFile</class>
+                <property name="Input Directory">/path/to/game/data</property>
+                <property name="File Filter">*.csv</property>
+            </processor>
+            <processor>
+                <id>ConvertRecord</id>
+                <class>org.apache.nifi.processors.standard.ConvertRecord</class>
+                <property name="Record Reader">CSVReader</property>
+                <property name="Record Writer">JsonRecordSetWriter</property>
+            </processor>
+            <processor>
+                <id>PutBigQuery</id>
+                <class>org.apache.nifi.processors.gcp.bigquery.PutBigQuery</class>
+                <property name="Project ID">${gcp.project.id}</property>
+                <property name="Dataset">game_analytics</property>
+                <property name="Table Name">raw_game_data</property>
+            </processor>
+        </processors>
+        <connections>
+            <connection>
+                <source>GetFile</source>
+                <destination>ConvertRecord</destination>
+            </connection>
+            <connection>
+                <source>ConvertRecord</source>
+                <destination>PutBigQuery</destination>
+            </connection>
+        </connections>
+    </snippet>
+</template>

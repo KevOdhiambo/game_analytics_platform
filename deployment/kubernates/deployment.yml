@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: game-analytics-api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: game-analytics-api
+  template:
+    metadata:
+      labels:
+        app: game-analytics-api
+    spec:
+      containers:
+      - name: game-analytics-api
+        image: gcr.io/your-project/game-analytics-api:latest
+        ports:
+        - containerPort: 5000
+        env:
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: /var/secrets/google/key.json
+        volumeMounts:
+        - name: google-cloud-key
+          mountPath: /var/secrets/google
+      volumes:
+      - name: google-cloud-key
+        secret:
+          secretName: google-cloud-key

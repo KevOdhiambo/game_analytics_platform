@@ -1,0 +1,37 @@
+stages:
+  - test
+  - build
+  - deploy
+
+variables:
+  DOCKER_IMAGE: gcr.io/${GCP_PROJECT_ID}/game-analytics-api
+
+test:
+  stage: test
+  image: python:3.8
+  script:
+    - pip install -r requirements.txt
+    - pytest tests/
+
+build:
+  stage: build
+  image: docker:latest
+  services:
+    - docker:dind
+  script:
+    - docker build -t $DOCKER_IMAGE:$CI_COMMIT_SHA .
+    - echo $GCP_SERVICE_KEY > gcloud-service-key.json
+    - docker login -u _json_key --password-stdin https://gcr.io < gcloud-service-key.json
+    - docker push $DOCKER_IMAGE:$CI_COMMIT_SHA
+
+deploy:
+  stage: deploy
+  image: google/cloud-sdk
+  script:
+    - echo $GCP_SERVICE_KEY > gcloud-service-key.json
+    - gcloud auth activate-service-account --key-file gcloud-service-key.json
+    - gcloud config set project $GCP_PROJECT_ID
+    - gcloud container clusters get-credentials $GCP_CLUSTER_NAME --zone $GCP_ZONE
+    - kubectl set image deployment/game-analytics-api game-analytics-api=$DOCKER_IMAGE:$CI_COMMIT_SHA
+  only:
+    - main
