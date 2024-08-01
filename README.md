@@ -85,9 +85,3 @@ The Real-time Game Analytics Platform successfully met its objectives by:
 7. Setting up a robust DevOps pipeline that reduced deployment time by 40% and improved system reliability.
 
 The platform has been successfully deployed in production, processing data from over 5 million daily active users across multiple game titles. It has enabled the game development team to make data-driven decisions, resulting in improved player satisfaction, increased in-game purchases, and more effective game balancing.
-
-## Contributing
-Please read CONTRIBUTING.md for details on our code of conduct and the process for submitting pull requests.
-
-## License
-This project is licensed under the MIT License - see the LICENSE.md file for details.
